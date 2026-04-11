@@ -130,7 +130,12 @@ exports.updateReview = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to update this review' });
     }
 
-    review = await Review.findByIdAndUpdate(req.params.id, req.body, {
+    // Whitelist updatable fields -- prevents user from overwriting company/user refs
+    const allowedUpdates = {};
+    if (req.body.rating  !== undefined) allowedUpdates.rating  = req.body.rating;
+    if (req.body.comment !== undefined) allowedUpdates.comment = req.body.comment;
+
+    review = await Review.findByIdAndUpdate(req.params.id, allowedUpdates, {
       new: true,
       runValidators: true
     });
