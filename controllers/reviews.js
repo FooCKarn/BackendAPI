@@ -29,12 +29,15 @@ exports.getReviews = async (req, res, next) => {
   
 
   try {
+
+    const parsedQuery = JSON.parse(queryStr);
+
     if (req.params.id) {
-      queryStr.company = req.params.id
-      query = Review.find(JSON.parse(queryStr))
+      parsedQuery.company = req.params.id;
+      query = Review.find(parsedQuery)
         .populate({ path: 'user', select: 'name email' });
     } else {
-      query = Review.find(JSON.parse(queryStr))
+      query = Review.find(parsedQuery)
         .populate({ path: 'company', select: 'name' })
         .populate({ path: 'user', select: 'name email' });
     }
@@ -46,7 +49,7 @@ exports.getReviews = async (req, res, next) => {
       query = query.sort('-createdAt');
     }
     
-    const total = await Review.countDocuments();
+    const total = await Review.countDocuments(parsedQuery);
     query = query.skip(startIndex).limit(limit);
     const reviews = await query;
 
