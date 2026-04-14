@@ -146,6 +146,7 @@ exports.updateReview = async (req, res, next) => {
     review.rating = parseInt(allowedUpdates.rating);
     review.comment = allowedUpdates.comment;
     review.edited = true;
+    review.editedAt = Date.now();
 
     review.save();
 

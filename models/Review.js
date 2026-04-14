@@ -16,7 +16,8 @@ const ReviewSchema = new mongoose.Schema({
     user: { type: mongoose.Schema.ObjectId, ref: 'User', required: true },
 
     createdAt: { type: Date, default: Date.now },
-    edited : {type : Boolean, default : false}
+    edited : {type : Boolean, default : false},
+    editedAt : {type: Date, default: Date.now}
   }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
