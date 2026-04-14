@@ -17,15 +17,43 @@ const ReviewSchema = new mongoose.Schema({
 
     createdAt: { type: Date, default: Date.now },
     edited : {type : Boolean, default : false},
-    editedAt : {type: Date}
+    editedAt : {type: Date},
+
+    effectiveDate: { type: Date, default: Date.now },
   }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
 
+// Keep effectiveDate in sync before every save
+ReviewSchema.pre('save', function (next) {
+    this.effectiveDate = (this.edited && this.editedAt) ? this.editedAt : this.createdAt;
+    next();
+});
+
+// Also sync on findOneAndUpdate / updateOne / updateMany
+ReviewSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function (next) {
+    const update = this.getUpdate();
+
+    const isEdited  = update.$set?.edited  ?? update.edited;
+    const editedAt  = update.$set?.editedAt ?? update.editedAt;
+    const createdAt = update.$set?.createdAt;
+
+    if (isEdited && editedAt) {
+        // Being marked as edited — use editedAt
+        this.setUpdate({ ...update, $set: { ...update.$set, effectiveDate: editedAt } });
+    } else if (createdAt) {
+        // createdAt is being changed (rare) — fall back to it
+        this.setUpdate({ ...update, $set: { ...update.$set, effectiveDate: createdAt } });
+    }
+    // Otherwise effectiveDate stays as-is (no change needed)
+
+    next();
+});
+
 // Indexes
 // reviews for company X, newest first
-ReviewSchema.index({ company: 1, createdAt: -1 });
+ReviewSchema.index({ company: 1, effectiveDate: -1 });
 // One review per user per company (prevents duplicate reviews)
 ReviewSchema.index({ company: 1, user: 1 }, { unique: true });
 

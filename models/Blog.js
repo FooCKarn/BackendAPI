@@ -8,7 +8,7 @@ const BlogSchema = new mongoose.Schema({
     isDeletedByAdmin: {type: Boolean, default: false },
     createdAt: { type: Date, default: Date.now },
     edited : {type : Boolean, default : false},
-    editedAt: { type: Date, default: Date.now },
+    editedAt: { type: Date},
 }, {
   toJSON: { virtuals: true },
   toObject: { virtuals: true }
