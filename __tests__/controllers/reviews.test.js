@@ -276,130 +276,127 @@ describe('Reviews Controller', () => {
       });
     });
   });
+describe('updateReview', () => {
+  let mockReview;
 
-  describe('updateReview', () => {
-    it('should update review successfully', async () => {
-      req.params.id = 'review123';
-      req.body = { rating: 4, comment: 'Updated' };
-      const mockReview = {
-        _id: 'review123',
-        user: { toString: () => 'user123' },
-        company: 'comp123'
-      };
-      const updatedReview = { ...mockReview, rating: 4, comment: 'Updated' };
+  beforeEach(() => {
+    // สร้าง Mock Review พื้นฐานไว้ใช้ในทุก Case
+    mockReview = {
+      _id: 'review123',
+      user: { toString: () => 'user123' },
+      company: 'comp123',
+      rating: 5,
+      comment: 'Old comment',
+      save: jest.fn().mockResolvedValue(true)
+    };
+    Review.calcAverageRating = jest.fn().mockResolvedValue();
+  });
 
-      Review.findById.mockResolvedValue(mockReview);
-      Review.findByIdAndUpdate.mockResolvedValue(updatedReview);
-      Review.calcAverageRating = jest.fn().mockResolvedValue();
+  it('should update review successfully and set edited flag', async () => {
+    req.params.id = 'review123';
+    req.body = { rating: 4, comment: 'Updated' };
 
-      await updateReview(req, res, next);
+    Review.findById.mockResolvedValue(mockReview);
 
-      expect(Review.findByIdAndUpdate).toHaveBeenCalledWith('review123', { rating: 4, comment: 'Updated' }, { new: true, runValidators: true });
-      expect(Review.calcAverageRating).toHaveBeenCalledWith('comp123');
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    await updateReview(req, res, next);
 
-    it('should return 404 if review not found', async () => {
-      req.params.id = 'nonexistent';
-      Review.findById.mockResolvedValue(null);
+    expect(mockReview.rating).toBe(4);
+    expect(mockReview.comment).toBe('Updated');
+    expect(mockReview.edited).toBe(true);
+    expect(mockReview.save).toHaveBeenCalled();
+    expect(Review.calcAverageRating).toHaveBeenCalledWith('comp123');
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
 
-      await updateReview(req, res, next);
+  it('should return 200 without saving if data is unchanged', async () => {
+    req.params.id = 'review123';
+    req.body = { rating: 5, comment: 'Old comment' }; // ข้อมูลเดิมเป๊ะ
 
-      expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'No review with the id of nonexistent'
-      });
-    });
+    Review.findById.mockResolvedValue(mockReview);
 
-    it('should return 401 if not authorized', async () => {
-      req.params.id = 'review123';
-      const mockReview = {
-        _id: 'review123',
-        user: { toString: () => 'otheruser' }
-      };
-      Review.findById.mockResolvedValue(mockReview);
+    await updateReview(req, res, next);
 
-      await updateReview(req, res, next);
+    expect(mockReview.save).not.toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+    expect(res.json).toHaveBeenCalledWith({ success: true, data: mockReview });
+  });
 
-      expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'Not authorized to update this review'
-      });
-    });
+  it('should allow admin to update any review even if not the owner', async () => {
+    req.params.id = 'review123';
+    req.user.role = 'admin';
+    req.user.id = 'admin456'; // คนละ id กับเจ้าของรีวิว
+    req.body = { rating: 1 };
 
-    it('should allow admin to update any review', async () => {
-      req.params.id = 'review123';
-      req.user.role = 'admin';
-      req.body = { rating: 3 };
-      const mockReview = {
-        _id: 'review123',
-        user: { toString: () => 'otheruser' },
-        company: 'comp123'
-      };
-      const updatedReview = { ...mockReview, rating: 3 };
+    Review.findById.mockResolvedValue(mockReview);
 
-      Review.findById.mockResolvedValue(mockReview);
-      Review.findByIdAndUpdate.mockResolvedValue(updatedReview);
-      Review.calcAverageRating = jest.fn().mockResolvedValue();
+    await updateReview(req, res, next);
 
-      await updateReview(req, res, next);
+    expect(mockReview.rating).toBe(1);
+    expect(mockReview.save).toHaveBeenCalled();
+    expect(res.status).toHaveBeenCalledWith(200);
+  });
 
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+  it('should return 401 if not authorized (not owner and not admin)', async () => {
+    req.params.id = 'review123';
+    req.user.id = 'hacker789'; // ไม่ใช่เจ้าของ
+    req.user.role = 'user';
 
-    it('should only update allowed fields (rating and comment)', async () => {
-      req.params.id = 'review123';
-      req.body = { rating: 4, comment: 'New comment', company: 'hacked', user: 'hacked' };
-      const mockReview = {
-        _id: 'review123',
-        user: { toString: () => 'user123' },
-        company: 'comp123'
-      };
-      const updatedReview = { ...mockReview, rating: 4, comment: 'New comment' };
+    Review.findById.mockResolvedValue(mockReview);
 
-      Review.findById.mockResolvedValue(mockReview);
-      Review.findByIdAndUpdate.mockResolvedValue(updatedReview);
-      Review.calcAverageRating = jest.fn().mockResolvedValue();
+    await updateReview(req, res, next);
 
-      await updateReview(req, res, next);
+    expect(res.status).toHaveBeenCalledWith(401);
+    expect(mockReview.save).not.toHaveBeenCalled();
+  });
 
-      expect(Review.findByIdAndUpdate).toHaveBeenCalledWith('review123', { rating: 4, comment: 'New comment' }, { new: true, runValidators: true });
-    });
+  it('should return 404 if review not found', async () => {
+    req.params.id = 'nonexistent';
+    Review.findById.mockResolvedValue(null);
 
-    it('should handle update with no rating or comment in body', async () => {
-      req.params.id = 'review123';
-      req.body = {};
-      const mockReview = {
-        _id: 'review123',
-        user: { toString: () => 'user123' },
-        company: 'comp123'
-      };
+    await updateReview(req, res, next);
 
-      Review.findById.mockResolvedValue(mockReview);
-      Review.findByIdAndUpdate.mockResolvedValue(mockReview);
-      Review.calcAverageRating = jest.fn().mockResolvedValue();
+    expect(res.status).toHaveBeenCalledWith(404);
+  });
 
-      await updateReview(req, res, next);
+  it('should return 400 on database error', async () => {
+    req.params.id = 'review123';
+    Review.findById.mockRejectedValue(new Error('DB error'));
 
-      expect(Review.findByIdAndUpdate).toHaveBeenCalledWith('review123', {}, { new: true, runValidators: true });
-      expect(res.status).toHaveBeenCalledWith(200);
-    });
+    await updateReview(req, res, next);
 
-    it('should return 400 on error', async () => {
-      req.params.id = 'review123';
-      Review.findById.mockRejectedValue(new Error('DB error'));
-
-      await updateReview(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({
-        success: false,
-        message: 'DB error'
-      });
+    expect(res.status).toHaveBeenCalledWith(400);
+    expect(res.json).toHaveBeenCalledWith({
+      success: false,
+      message: 'DB error'
     });
   });
+
+  it('should update only comment if rating is undefined in req.body', async () => {
+  req.params.id = 'review123';
+  // ส่งมาแค่ comment อย่างเดียว ไม่ส่ง rating
+  req.body = { comment: 'Updated comment only' };
+  
+  const mockReview = {
+    _id: 'review123',
+    user: { toString: () => 'user123' },
+    company: 'comp123',
+    rating: 5, // ค่าเดิม
+    comment: 'Old comment',
+    save: jest.fn().mockResolvedValue(true)
+  };
+
+  Review.findById.mockResolvedValue(mockReview);
+  Review.calcAverageRating = jest.fn().mockResolvedValue();
+
+  await updateReview(req, res, next);
+
+  // ตรวจสอบว่า rating ยังเป็นค่าเดิม (5) แต่ comment เปลี่ยนไป
+  expect(mockReview.rating).toBe(5); 
+  expect(mockReview.comment).toBe('Updated comment only');
+  expect(mockReview.save).toHaveBeenCalled();
+  expect(res.status).toHaveBeenCalledWith(200);
+});
+});
 
   describe('deleteReview', () => {
     it('should delete review successfully', async () => {

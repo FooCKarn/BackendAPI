@@ -17,15 +17,36 @@ const ReviewSchema = new mongoose.Schema({
 
     createdAt: { type: Date, default: Date.now },
     edited : {type : Boolean, default : false},
-    editedAt : {type: Date}
+    editedAt : {type: Date},
+    effectiveDate: { type: Date, default: Date.now },
   }, {
     toJSON: { virtuals: true },
     toObject: { virtuals: true }
 });
 
+// Keep effectiveDate in sync before every save
+ReviewSchema.pre('save', function () {
+    this.effectiveDate = (this.edited && this.editedAt) ? this.editedAt : this.createdAt;
+});
+
+// Also sync on findOneAndUpdate / updateOne / updateMany
+ReviewSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
+    const update = this.getUpdate();
+
+    const isEdited  = update.$set?.edited  ?? update.edited;
+    const editedAt  = update.$set?.editedAt ?? update.editedAt;
+    const createdAt = update.$set?.createdAt;
+
+    if (isEdited && editedAt) {
+        this.setUpdate({ ...update, $set: { ...update.$set, effectiveDate: editedAt } });
+    } else if (createdAt) {
+        this.setUpdate({ ...update, $set: { ...update.$set, effectiveDate: createdAt } });
+    }
+});
+
 // Indexes
 // reviews for company X, newest first
-ReviewSchema.index({ company: 1, createdAt: -1 });
+ReviewSchema.index({ company: 1, effectiveDate: -1 });
 // One review per user per company (prevents duplicate reviews)
 ReviewSchema.index({ company: 1, user: 1 }, { unique: true });
 
@@ -56,12 +77,12 @@ ReviewSchema.statics.calcAverageRating = async function (companyId) {
 };
 
 // Recalculate after save
-ReviewSchema.post('save', function () {
-  this.constructor.calcAverageRating(this.company);
+ReviewSchema.post('save', async function () {
+    await this.constructor.calcAverageRating(this.company);
 });
 
 // Recalculate after delete
-ReviewSchema.post('findOneAndDelete', function (doc) {
+ReviewSchema.post('findOneAndDelete', async function (doc) {
   if (doc) doc.constructor.calcAverageRating(doc.company);
 });
 
