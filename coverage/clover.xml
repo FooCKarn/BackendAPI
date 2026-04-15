@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1776241020076" clover="3.2.0">
-  <project timestamp="1776241020076" name="All files">
-    <metrics statements="401" coveredstatements="382" conditionals="144" coveredconditionals="127" methods="39" coveredmethods="37" elements="584" coveredelements="546" complexity="0" loc="401" ncloc="401" packages="6" files="15" classes="15"/>
+<coverage generated="1776241873960" clover="3.2.0">
+  <project timestamp="1776241873960" name="All files">
+    <metrics statements="436" coveredstatements="413" conditionals="172" coveredconditionals="147" methods="43" coveredmethods="39" elements="651" coveredelements="599" complexity="0" loc="436" ncloc="436" packages="6" files="17" classes="17"/>
     <package name="se-project-be-68-2-skill-issue">
       <metrics statements="43" coveredstatements="43" conditionals="6" coveredconditionals="6" methods="3" coveredmethods="3"/>
       <file name="server.js" path="C:\SE_Project\se-project-be-68-2-skill-issue\server.js">
@@ -356,12 +356,53 @@
       </file>
     </package>
     <package name="se-project-be-68-2-skill-issue.models">
-      <metrics statements="47" coveredstatements="36" conditionals="18" coveredconditionals="4" methods="8" coveredmethods="6"/>
+      <metrics statements="82" coveredstatements="67" conditionals="46" coveredconditionals="24" methods="12" coveredmethods="8"/>
+      <file name="Blog.js" path="C:\SE_Project\se-project-be-68-2-skill-issue\models\Blog.js">
+        <metrics statements="18" coveredstatements="16" conditionals="14" coveredconditionals="10" methods="2" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="22" count="1" type="stmt"/>
+        <line num="23" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="24" count="0" type="stmt"/>
+        <line num="27" count="1" type="stmt"/>
+        <line num="28" count="3" type="stmt"/>
+        <line num="29" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="30" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="31" count="3" type="stmt"/>
+        <line num="33" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="34" count="1" type="stmt"/>
+        <line num="35" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="36" count="1" type="stmt"/>
+        <line num="38" count="3" type="stmt"/>
+        <line num="41" count="1" type="stmt"/>
+        <line num="43" count="1" type="stmt"/>
+        <line num="50" count="1" type="stmt"/>
+      </file>
       <file name="Booking.js" path="C:\SE_Project\se-project-be-68-2-skill-issue\models\Booking.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
         <line num="24" count="6" type="stmt"/>
+      </file>
+      <file name="Comment.js" path="C:\SE_Project\se-project-be-68-2-skill-issue\models\Comment.js">
+        <metrics statements="17" coveredstatements="15" conditionals="14" coveredconditionals="10" methods="2" coveredmethods="1"/>
+        <line num="1" count="1" type="stmt"/>
+        <line num="3" count="1" type="stmt"/>
+        <line num="18" count="1" type="stmt"/>
+        <line num="19" count="0" type="cond" truecount="0" falsecount="4"/>
+        <line num="20" count="0" type="stmt"/>
+        <line num="23" count="1" type="stmt"/>
+        <line num="24" count="3" type="stmt"/>
+        <line num="25" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="26" count="3" type="cond" truecount="2" falsecount="0"/>
+        <line num="27" count="3" type="stmt"/>
+        <line num="29" count="3" type="cond" truecount="4" falsecount="0"/>
+        <line num="30" count="1" type="stmt"/>
+        <line num="31" count="2" type="cond" truecount="2" falsecount="0"/>
+        <line num="32" count="1" type="stmt"/>
+        <line num="34" count="3" type="stmt"/>
+        <line num="37" count="1" type="stmt"/>
+        <line num="39" count="1" type="stmt"/>
       </file>
       <file name="Company.js" path="C:\SE_Project\se-project-be-68-2-skill-issue\models\Company.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
