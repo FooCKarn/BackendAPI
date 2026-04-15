@@ -23,16 +23,16 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">91.11% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>84/84</span>
+                <span class='fraction'>82/90</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">92.1% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>34/34</span>
+                <span class='fraction'>35/38</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">100% </span>
+                <span class="strong">90.47% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>78/78</span>
+                <span class='fraction'>76/84</span>
             </div>
         
             
@@ -244,7 +244,14 @@
 <a name='L179'></a><a href='#L179'>179</a>
 <a name='L180'></a><a href='#L180'>180</a>
 <a name='L181'></a><a href='#L181'>181</a>
-<a name='L182'></a><a href='#L182'>182</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L182'></a><a href='#L182'>182</a>
+<a name='L183'></a><a href='#L183'>183</a>
+<a name='L184'></a><a href='#L184'>184</a>
+<a name='L185'></a><a href='#L185'>185</a>
+<a name='L186'></a><a href='#L186'>186</a>
+<a name='L187'></a><a href='#L187'>187</a>
+<a name='L188'></a><a href='#L188'>188</a>
+<a name='L189'></a><a href='#L189'>189</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -384,18 +391,25 @@
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -564,16 +578,23 @@ exports.updateReview = async (req, res, next) =&gt; {
     const allowedUpdates = {};
     if (req.body.rating  !== undefined) allowedUpdates.rating  = req.body.rating;
     if (req.body.comment !== undefined) allowedUpdates.comment = req.body.comment;
+    
 &nbsp;
-    review = await Review.findByIdAndUpdate(req.params.id, allowedUpdates, {
-      new: true,
-      runValidators: true
-    });
+    if(review.rating.toString() === allowedUpdates.rating.toString() &amp;&amp; <span class="branch-1 cbranch-no" title="branch not covered" >review.comment === allowedUpdates.comment)</span>{
+<span class="cstat-no" title="statement not covered" >      return res.status(200).json({ success: true, data: review });</span>
+    }
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    review.rating = parseInt(allowedUpdates.rating);</span>
+<span class="cstat-no" title="statement not covered" >    review.comment = allowedUpdates.comment;</span>
+<span class="cstat-no" title="statement not covered" >    review.edited = true;</span>
+<span class="cstat-no" title="statement not covered" >    review.editedAt = Date.now();</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" >    review.save();</span>
 &nbsp;
     // Recalculate average rating
-    await Review.calcAverageRating(review.company);
+<span class="cstat-no" title="statement not covered" >    await Review.calcAverageRating(review.company);</span>
 &nbsp;
-    res.status(200).json({ success: true, data: review });
+<span class="cstat-no" title="statement not covered" >    res.status(200).json({ success: true, data: review });</span>
   } catch (err) {
     console.log(err);
     return res.status(400).json({ success: false, message: err.message });
@@ -613,7 +634,7 @@ exports.deleteReview = async (req, res, next) =&gt; {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-14T18:36:08.971Z
+                at 2026-04-15T08:16:59.982Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
