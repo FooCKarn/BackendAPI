@@ -139,12 +139,15 @@ exports.updateReview = async (req, res, next) => {
     if (req.body.comment !== undefined) allowedUpdates.comment = req.body.comment;
     
 
-    if(review.rating.toString() === allowedUpdates.rating.toString() && review.comment === allowedUpdates.comment){
+    const newRating = allowedUpdates.rating !== undefined ? allowedUpdates.rating : review.rating;
+    const newComment = allowedUpdates.comment !== undefined ? allowedUpdates.comment : review.comment;
+
+    if(review.rating.toString() === newRating.toString() && review.comment === newComment){
       return res.status(200).json({ success: true, data: review });
     }
 
-    review.rating = parseInt(allowedUpdates.rating);
-    review.comment = allowedUpdates.comment;
+    review.rating = parseInt(newRating);
+    review.comment = newComment;
     review.edited = true;
     review.editedAt = Date.now();
 

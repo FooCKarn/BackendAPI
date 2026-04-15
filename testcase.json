@@ -1902,7 +1902,7 @@
   "variable": [
     {
       "key": "URL",
-      "value": "http://localhost:5000",
+      "value": "https://backend-api-tawny-phi.vercel.app",
       "type": "string"
     }
   ]

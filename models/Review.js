@@ -77,8 +77,8 @@ ReviewSchema.statics.calcAverageRating = async function (companyId) {
 };
 
 // Recalculate after save
-ReviewSchema.post('save', async function (doc) {
-    await doc.constructor.calcAverageRating(doc.company);
+ReviewSchema.post('save', async function () {
+    await this.constructor.calcAverageRating(this.company);
 });
 
 // Recalculate after delete

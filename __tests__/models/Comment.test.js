@@ -80,8 +80,9 @@ describe('Comment Model (FINAL)', () => {
         edited: false
       });
 
-      const hook = Comment.schema.s.hooks._pres.get('save')[0].fn;
-      hook.call(comment, () => {});
+      const hooks = Comment.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(comment);
 
       expect(comment.effectiveDate.getTime())
         .toBe(createdAt.getTime());
@@ -96,8 +97,9 @@ describe('Comment Model (FINAL)', () => {
         editedAt
       });
 
-      const hook = Comment.schema.s.hooks._pres.get('save')[0].fn;
-      hook.call(comment, () => {});
+      const hooks = Comment.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(comment);
 
       expect(comment.effectiveDate.getTime())
         .toBe(editedAt.getTime());
@@ -112,8 +114,9 @@ describe('Comment Model (FINAL)', () => {
         edited: true
       });
 
-      const hook = Comment.schema.s.hooks._pres.get('save')[0].fn;
-      hook.call(comment, () => {});
+      const hooks = Comment.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(comment);
 
       expect(comment.effectiveDate.getTime())
         .toBe(createdAt.getTime());

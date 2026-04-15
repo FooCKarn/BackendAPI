@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "main": "server.js",
   "scripts": {
-    "test" : "jest",
-    "test-coverage" : "jest --watchAll --coverage",
+    "test": "jest --coverage",
     "dev": "nodemon server.js"
   },
   "author": "",

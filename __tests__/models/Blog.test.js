@@ -63,7 +63,9 @@ describe('Blog Model (REAL COVERAGE)', () => {
       blog.createdAt = createdAt;
       blog.edited = false;
 
-      blog.validateSync(); // 🔥 trigger hook
+      const hooks = Blog.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(blog);
 
       expect(blog.effectiveDate.getTime())
         .toBe(createdAt.getTime());
@@ -79,7 +81,9 @@ describe('Blog Model (REAL COVERAGE)', () => {
       blog.edited = true;
       blog.editedAt = editedAt;
 
-      blog.validateSync(); // 🔥 trigger hook
+      const hooks = Blog.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(blog);
 
       expect(blog.effectiveDate.getTime())
         .toBe(editedAt.getTime());
@@ -95,7 +99,9 @@ describe('Blog Model (REAL COVERAGE)', () => {
       blog.createdAt = createdAt;
       blog.edited = true;
 
-      blog.validateSync();
+      const hooks = Blog.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(blog);
 
       expect(blog.effectiveDate.getTime())
         .toBe(createdAt.getTime());

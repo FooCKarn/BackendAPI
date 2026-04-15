@@ -189,7 +189,7 @@ describe('Review Model', () => {
       expect(postHooks.length).toBeGreaterThan(0);
     });
 
-    it('post save hook should call calcAverageRating', () => {
+    it('post save hook should call calcAverageRating', async () => {
       const review = new Review({
         rating: 4,
         comment: 'Test',
@@ -197,12 +197,12 @@ describe('Review Model', () => {
         user: new mongoose.Types.ObjectId()
       });
 
-      const mockCalc = jest.fn();
+      const mockCalc = jest.fn().mockResolvedValue();
       review.constructor.calcAverageRating = mockCalc;
 
       // Execute the post save hook function directly
       const postSaveHooks = Review.schema.s.hooks._posts.get('save');
-      postSaveHooks[0].fn.call(review);
+      await postSaveHooks[0].fn.call(review);
 
       expect(mockCalc).toHaveBeenCalledWith(review.company);
     });
@@ -224,6 +224,147 @@ describe('Review Model', () => {
       const postDeleteHooks = Review.schema.s.hooks._posts.get('findOneAndDelete');
       // Should not throw when doc is null
       expect(() => postDeleteHooks[0].fn.call(null, null)).not.toThrow();
+    });
+  });
+
+  describe('pre save hook', () => {
+    it('should set effectiveDate to createdAt when not edited', () => {
+      const createdAt = new Date('2023-01-01');
+      const review = new Review({
+        rating: 4,
+        comment: 'Test',
+        company: new mongoose.Types.ObjectId(),
+        user: new mongoose.Types.ObjectId(),
+        createdAt,
+        edited: false
+      });
+
+      const hooks = Review.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(review);
+
+      expect(review.effectiveDate.getTime()).toBe(createdAt.getTime());
+    });
+
+    it('should set effectiveDate to editedAt when edited', () => {
+      const editedAt = new Date('2024-01-01');
+      const review = new Review({
+        rating: 4,
+        comment: 'Test',
+        company: new mongoose.Types.ObjectId(),
+        user: new mongoose.Types.ObjectId(),
+        edited: true,
+        editedAt
+      });
+
+      const hooks = Review.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(review);
+
+      expect(review.effectiveDate.getTime()).toBe(editedAt.getTime());
+    });
+
+    it('should fallback to createdAt if edited true but no editedAt', () => {
+      const createdAt = new Date('2023-01-01');
+      const review = new Review({
+        rating: 4,
+        comment: 'Test',
+        company: new mongoose.Types.ObjectId(),
+        user: new mongoose.Types.ObjectId(),
+        createdAt,
+        edited: true
+      });
+
+      const hooks = Review.schema.s.hooks._pres.get('save');
+      const hookFn = hooks.find(h => h.fn.toString().includes('effectiveDate')).fn;
+      hookFn.call(review);
+
+      expect(review.effectiveDate.getTime()).toBe(createdAt.getTime());
+    });
+  });
+
+  describe('pre update hook', () => {
+    it('should set effectiveDate when edited=true via $set', () => {
+      const editedAt = new Date();
+
+      const query = {
+        getUpdate: () => ({
+          $set: { edited: true, editedAt }
+        }),
+        setUpdate: jest.fn()
+      };
+
+      const hook = Review.schema.s.hooks._pres.get('findOneAndUpdate')[0].fn;
+      hook.call(query);
+
+      expect(query.setUpdate).toHaveBeenCalled();
+    });
+
+    it('should set effectiveDate when createdAt provided', () => {
+      const createdAt = new Date();
+
+      const query = {
+        getUpdate: () => ({
+          $set: { createdAt }
+        }),
+        setUpdate: jest.fn()
+      };
+
+      const hook = Review.schema.s.hooks._pres.get('findOneAndUpdate')[0].fn;
+      hook.call(query);
+
+      expect(query.setUpdate).toHaveBeenCalledWith(
+        expect.objectContaining({
+          $set: expect.objectContaining({
+            effectiveDate: createdAt
+          })
+        })
+      );
+    });
+
+    it('should handle top-level update (no $set)', () => {
+      const editedAt = new Date();
+
+      const query = {
+        getUpdate: () => ({
+          edited: true,
+          editedAt
+        }),
+        setUpdate: jest.fn()
+      };
+
+      const hook = Review.schema.s.hooks._pres.get('findOneAndUpdate')[0].fn;
+      hook.call(query);
+
+      expect(query.setUpdate).toHaveBeenCalled();
+    });
+
+    it('should not modify effectiveDate if no condition', () => {
+      const query = {
+        getUpdate: () => ({
+          $set: { comment: 'hello' }
+        }),
+        setUpdate: jest.fn()
+      };
+
+      const hook = Review.schema.s.hooks._pres.get('findOneAndUpdate')[0].fn;
+      hook.call(query);
+
+      expect(query.setUpdate).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('indexes', () => {
+    it('should have company + effectiveDate index', () => {
+      const indexes = Review.schema.indexes();
+      const found = indexes.some(i => i[0].company === 1 && i[0].effectiveDate === -1);
+      expect(found).toBe(true);
+    });
+
+    it('should have company + user unique index', () => {
+      const indexes = Review.schema.indexes();
+      const found = indexes.some(i => i[0].company === 1 && i[0].user === 1 && i[1]?.unique === true);
+      expect(found).toBe(true);
     });
   });
 });
