@@ -23,30 +23,30 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">71.42% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Branches</span>
-                <span class='fraction'>10/14</span>
+                <span class='fraction'>14/14</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">50% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Functions</span>
-                <span class='fraction'>1/2</span>
+                <span class='fraction'>2/2</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">88.23% </span>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>15/17</span>
+                <span class='fraction'>15/15</span>
             </div>
         
             
@@ -99,11 +99,9 @@
 <a name='L34'></a><a href='#L34'>34</a>
 <a name='L35'></a><a href='#L35'>35</a>
 <a name='L36'></a><a href='#L36'>36</a>
-<a name='L37'></a><a href='#L37'>37</a>
-<a name='L38'></a><a href='#L38'>38</a>
-<a name='L39'></a><a href='#L39'>39</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L37'></a><a href='#L37'>37</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -118,28 +116,26 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">3x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">3x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">5x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span></td><td class="text"><pre class="prettyprint lang-js">const mongoose = require('mongoose');
+<span class="cline-any cline-yes">5x</span></td><td class="text"><pre class="prettyprint lang-js">const mongoose = require('mongoose');
 &nbsp;
 const CommentSchema = new mongoose.Schema({
     text: { type: String, required: [true, "Please add a comment text"], trim: true, minlength: [1, 'Please add a comment text'], maxlength: [100, 'Comment cannot exceed 100 characters'] },
@@ -156,12 +152,11 @@ const CommentSchema = new mongoose.Schema({
     effectiveDate: { type: Date, default: Date.now }, 
 });
 &nbsp;
-CommentSchema.pre('save', <span class="fstat-no" title="function not covered" >fu</span>nction (next) {
-<span class="cstat-no" title="statement not covered" >    this.effectiveDate = (this.edited &amp;&amp; this.editedAt) ? this.editedAt : this.createdAt;</span>
-<span class="cstat-no" title="statement not covered" >    next();</span>
+CommentSchema.pre('save', function () {
+    this.effectiveDate = (this.edited &amp;&amp; this.editedAt) ? this.editedAt : this.createdAt;
 });
 &nbsp;
-CommentSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function (next) {
+CommentSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function () {
     const update = this.getUpdate();
     const isEdited  = update.$set?.edited  ?? update.edited;
     const editedAt  = update.$set?.editedAt ?? update.editedAt;
@@ -172,7 +167,6 @@ CommentSchema.pre(['findOneAndUpdate', 'updateOne', 'updateMany'], function (nex
     } else if (createdAt) {
         this.setUpdate({ ...update, $set: { ...update.$set, effectiveDate: createdAt } });
     }
-    next();
 });
 &nbsp;
 CommentSchema.index({ blog: 1, effectiveDate: -1 });
@@ -184,7 +178,7 @@ module.exports = mongoose.model('Comment', CommentSchema);</pre></td></tr></tabl
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-04-15T08:31:13.898Z
+                at 2026-04-15T11:19:45.419Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
