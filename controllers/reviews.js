@@ -137,18 +137,20 @@ exports.updateReview = async (req, res, next) => {
     const allowedUpdates = {};
     if (req.body.rating  !== undefined) allowedUpdates.rating  = req.body.rating;
     if (req.body.comment !== undefined) allowedUpdates.comment = req.body.comment;
-    
 
-    if(review.rating.toString() === allowedUpdates.rating.toString() && review.comment === allowedUpdates.comment){
+    const ratingUnchanged = (allowedUpdates.rating === undefined) || (review.rating.toString() === allowedUpdates.rating.toString());
+    const commentUnchanged = (allowedUpdates.comment === undefined) || (review.comment === allowedUpdates.comment);
+
+    if (ratingUnchanged && commentUnchanged) {
       return res.status(200).json({ success: true, data: review });
     }
 
-    review.rating = parseInt(allowedUpdates.rating);
-    review.comment = allowedUpdates.comment;
+    if (allowedUpdates.rating !== undefined) review.rating = parseInt(allowedUpdates.rating);
+    if (allowedUpdates.comment !== undefined) review.comment = allowedUpdates.comment;
     review.edited = true;
     review.editedAt = Date.now();
 
-    review.save();
+    await review.save();
 
     // Recalculate average rating
     await Review.calcAverageRating(review.company);
