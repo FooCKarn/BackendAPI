@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<coverage generated="1776251985461" clover="3.2.0">
-  <project timestamp="1776251985461" name="All files">
+<coverage generated="1776267013374" clover="3.2.0">
+  <project timestamp="1776267013375" name="All files">
     <metrics statements="476" coveredstatements="476" conditionals="192" coveredconditionals="192" methods="45" coveredmethods="45" elements="713" coveredelements="713" complexity="0" loc="476" ncloc="476" packages="6" files="21" classes="21"/>
-    <package name="se-project-be-68-2-skill-issue">
+    <package name="BackendAPI">
       <metrics statements="47" coveredstatements="47" conditionals="6" coveredconditionals="6" methods="3" coveredmethods="3"/>
-      <file name="server.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\server.js">
+      <file name="server.js" path="C:\SE_Project\BackendAPI\server.js">
         <metrics statements="47" coveredstatements="47" conditionals="6" coveredconditionals="6" methods="3" coveredmethods="3"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -55,9 +55,9 @@
         <line num="81" count="3" type="stmt"/>
       </file>
     </package>
-    <package name="se-project-be-68-2-skill-issue.config">
+    <package name="BackendAPI.config">
       <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
-      <file name="db.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\config\db.js">
+      <file name="db.js" path="C:\SE_Project\BackendAPI\config\db.js">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="1" coveredmethods="1"/>
         <line num="1" count="2" type="stmt"/>
         <line num="2" count="2" type="stmt"/>
@@ -67,9 +67,9 @@
         <line num="8" count="2" type="stmt"/>
       </file>
     </package>
-    <package name="se-project-be-68-2-skill-issue.controllers">
+    <package name="BackendAPI.controllers">
       <metrics statements="280" coveredstatements="280" conditionals="130" coveredconditionals="130" methods="26" coveredmethods="26"/>
-      <file name="auth.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\auth.js">
+      <file name="auth.js" path="C:\SE_Project\BackendAPI\controllers\auth.js">
         <metrics statements="33" coveredstatements="33" conditionals="10" coveredconditionals="10" methods="5" coveredmethods="5"/>
         <line num="6" count="4" type="stmt"/>
         <line num="13" count="4" type="stmt"/>
@@ -105,7 +105,7 @@
         <line num="93" count="1" type="stmt"/>
         <line num="97" count="1" type="stmt"/>
       </file>
-      <file name="blogs.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\blogs.js">
+      <file name="blogs.js" path="C:\SE_Project\BackendAPI\controllers\blogs.js">
         <metrics statements="12" coveredstatements="12" conditionals="8" coveredconditionals="8" methods="1" coveredmethods="1"/>
         <line num="2" count="4" type="stmt"/>
         <line num="4" count="4" type="stmt"/>
@@ -120,7 +120,7 @@
         <line num="28" count="1" type="stmt"/>
         <line num="29" count="1" type="stmt"/>
       </file>
-      <file name="bookings.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\bookings.js">
+      <file name="bookings.js" path="C:\SE_Project\BackendAPI\controllers\bookings.js">
         <metrics statements="74" coveredstatements="74" conditionals="44" coveredconditionals="44" methods="5" coveredmethods="5"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -197,7 +197,7 @@
         <line num="194" count="1" type="stmt"/>
         <line num="195" count="1" type="stmt"/>
       </file>
-      <file name="comments.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\comments.js">
+      <file name="comments.js" path="C:\SE_Project\BackendAPI\controllers\comments.js">
         <metrics statements="14" coveredstatements="14" conditionals="8" coveredconditionals="8" methods="1" coveredmethods="1"/>
         <line num="1" count="4" type="stmt"/>
         <line num="3" count="4" type="stmt"/>
@@ -214,7 +214,7 @@
         <line num="31" count="1" type="stmt"/>
         <line num="32" count="1" type="stmt"/>
       </file>
-      <file name="companies.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\companies.js">
+      <file name="companies.js" path="C:\SE_Project\BackendAPI\controllers\companies.js">
         <metrics statements="61" coveredstatements="61" conditionals="18" coveredconditionals="18" methods="7" coveredmethods="7"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -278,7 +278,7 @@
         <line num="136" count="1" type="stmt"/>
         <line num="137" count="1" type="stmt"/>
       </file>
-      <file name="reviews.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\controllers\reviews.js">
+      <file name="reviews.js" path="C:\SE_Project\BackendAPI\controllers\reviews.js">
         <metrics statements="86" coveredstatements="86" conditionals="42" coveredconditionals="42" methods="7" coveredmethods="7"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -368,9 +368,9 @@
         <line num="189" count="1" type="stmt"/>
       </file>
     </package>
-    <package name="se-project-be-68-2-skill-issue.middleware">
+    <package name="BackendAPI.middleware">
       <metrics statements="19" coveredstatements="19" conditionals="10" coveredconditionals="10" methods="3" coveredmethods="3"/>
-      <file name="auth.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\middleware\auth.js">
+      <file name="auth.js" path="C:\SE_Project\BackendAPI\middleware\auth.js">
         <metrics statements="19" coveredstatements="19" conditionals="10" coveredconditionals="10" methods="3" coveredmethods="3"/>
         <line num="6" count="4" type="stmt"/>
         <line num="7" count="4" type="stmt"/>
@@ -393,9 +393,9 @@
         <line num="49" count="2" type="stmt"/>
       </file>
     </package>
-    <package name="se-project-be-68-2-skill-issue.models">
+    <package name="BackendAPI.models">
       <metrics statements="76" coveredstatements="76" conditionals="46" coveredconditionals="46" methods="12" coveredmethods="12"/>
-      <file name="Blog.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\Blog.js">
+      <file name="Blog.js" path="C:\SE_Project\BackendAPI\models\Blog.js">
         <metrics statements="16" coveredstatements="16" conditionals="14" coveredconditionals="14" methods="2" coveredmethods="2"/>
         <line num="1" count="5" type="stmt"/>
         <line num="3" count="5" type="stmt"/>
@@ -414,13 +414,13 @@
         <line num="41" count="5" type="stmt"/>
         <line num="48" count="5" type="stmt"/>
       </file>
-      <file name="Booking.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\Booking.js">
+      <file name="Booking.js" path="C:\SE_Project\BackendAPI\models\Booking.js">
         <metrics statements="3" coveredstatements="3" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="6" type="stmt"/>
         <line num="3" count="6" type="stmt"/>
         <line num="24" count="6" type="stmt"/>
       </file>
-      <file name="Comment.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\Comment.js">
+      <file name="Comment.js" path="C:\SE_Project\BackendAPI\models\Comment.js">
         <metrics statements="15" coveredstatements="15" conditionals="14" coveredconditionals="14" methods="2" coveredmethods="2"/>
         <line num="1" count="5" type="stmt"/>
         <line num="3" count="5" type="stmt"/>
@@ -438,7 +438,7 @@
         <line num="35" count="5" type="stmt"/>
         <line num="37" count="5" type="stmt"/>
       </file>
-      <file name="Company.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\Company.js">
+      <file name="Company.js" path="C:\SE_Project\BackendAPI\models\Company.js">
         <metrics statements="5" coveredstatements="5" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="8" type="stmt"/>
         <line num="3" count="8" type="stmt"/>
@@ -446,7 +446,7 @@
         <line num="27" count="8" type="stmt"/>
         <line num="34" count="8" type="stmt"/>
       </file>
-      <file name="Review.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\Review.js">
+      <file name="Review.js" path="C:\SE_Project\BackendAPI\models\Review.js">
         <metrics statements="25" coveredstatements="25" conditionals="18" coveredconditionals="18" methods="5" coveredmethods="5"/>
         <line num="1" count="6" type="stmt"/>
         <line num="6" count="6" type="stmt"/>
@@ -474,7 +474,7 @@
         <line num="86" count="2" type="cond" truecount="2" falsecount="0"/>
         <line num="89" count="6" type="stmt"/>
       </file>
-      <file name="User.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\models\User.js">
+      <file name="User.js" path="C:\SE_Project\BackendAPI\models\User.js">
         <metrics statements="12" coveredstatements="12" conditionals="0" coveredconditionals="0" methods="3" coveredmethods="3"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
@@ -490,9 +490,9 @@
         <line num="39" count="5" type="stmt"/>
       </file>
     </package>
-    <package name="se-project-be-68-2-skill-issue.routes">
+    <package name="BackendAPI.routes">
       <metrics statements="48" coveredstatements="48" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
-      <file name="auth.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\auth.js">
+      <file name="auth.js" path="C:\SE_Project\BackendAPI\routes\auth.js">
         <metrics statements="9" coveredstatements="9" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -504,7 +504,7 @@
         <line num="8" count="4" type="stmt"/>
         <line num="9" count="4" type="stmt"/>
       </file>
-      <file name="blogs.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\blogs.js">
+      <file name="blogs.js" path="C:\SE_Project\BackendAPI\routes\blogs.js">
         <metrics statements="8" coveredstatements="8" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -515,7 +515,7 @@
         <line num="8" count="3" type="stmt"/>
         <line num="10" count="3" type="stmt"/>
       </file>
-      <file name="bookings.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\bookings.js">
+      <file name="bookings.js" path="C:\SE_Project\BackendAPI\routes\bookings.js">
         <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
@@ -525,7 +525,7 @@
         <line num="9" count="5" type="stmt"/>
         <line num="14" count="5" type="stmt"/>
       </file>
-      <file name="comments.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\comments.js">
+      <file name="comments.js" path="C:\SE_Project\BackendAPI\routes\comments.js">
         <metrics statements="6" coveredstatements="6" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="3" type="stmt"/>
         <line num="2" count="3" type="stmt"/>
@@ -534,7 +534,7 @@
         <line num="6" count="3" type="stmt"/>
         <line num="8" count="3" type="stmt"/>
       </file>
-      <file name="companies.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\companies.js">
+      <file name="companies.js" path="C:\SE_Project\BackendAPI\routes\companies.js">
         <metrics statements="11" coveredstatements="11" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="4" type="stmt"/>
         <line num="2" count="4" type="stmt"/>
@@ -548,7 +548,7 @@
         <line num="13" count="4" type="stmt"/>
         <line num="17" count="4" type="stmt"/>
       </file>
-      <file name="reviews.js" path="C:\Users\foo\Desktop\SWEN_PROJ\BE\se-project-be-68-2-skill-issue\routes\reviews.js">
+      <file name="reviews.js" path="C:\SE_Project\BackendAPI\routes\reviews.js">
         <metrics statements="7" coveredstatements="7" conditionals="0" coveredconditionals="0" methods="0" coveredmethods="0"/>
         <line num="1" count="5" type="stmt"/>
         <line num="2" count="5" type="stmt"/>
