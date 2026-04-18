@@ -1,3 +1,10 @@
 node_modules/*
 config/config.env
 coverage/*
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
