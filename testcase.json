@@ -1869,7 +1869,7 @@
               "pm.test('Cleanup review deleted (200)', function () {",
               "    pm.response.to.have.status(200);",
               "});",
-              "pm.execution.setNextRequest('Blog: Create Blog');"
+              "pm.execution.setNextRequest('Blog: User Re-Login');"
             ],
             "type": "text/javascript",
             "packages": {},
@@ -1894,6 +1894,47 @@
           "raw": "{{URL}}/api/v1/reviews/{{REVIEW_ID}}",
           "host": ["{{URL}}"],
           "path": ["api", "v1", "reviews", "{{REVIEW_ID}}"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Blog: User Re-Login",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('User re-login successful (200)', function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "const response = pm.response.json();",
+              "pm.environment.set('TOKEN', response.token);",
+              "pm.execution.setNextRequest('Blog: Create Blog');"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"{{TEST_EMAIL}}\",\n    \"password\": \"password123\"\n}"
+        },
+        "url": {
+          "raw": "{{URL}}/api/v1/auth/login",
+          "host": ["{{URL}}"],
+          "path": ["api", "v1", "auth", "login"]
         }
       },
       "response": []
