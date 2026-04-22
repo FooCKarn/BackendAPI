@@ -10,6 +10,7 @@ describe('Blogs Controller', () => {
     req = {
       body: {},
       params: {},
+      query: {},
       user: { id: 'user123' }
     };
     res = {
@@ -18,26 +19,95 @@ describe('Blogs Controller', () => {
     };
     next = jest.fn();
     jest.clearAllMocks();
+    Blog.countDocuments = jest.fn();
   });
 
   describe('getBlogs', () => {
     it('should return all blogs', async () => {
       const mockBlogs = [{ _id: 'b1', title: 'Blog 1' }, { _id: 'b2', title: 'Blog 2' }];
-      const mockQuery = { populate: jest.fn().mockReturnThis(), sort: jest.fn().mockResolvedValue(mockBlogs) };
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue(mockBlogs)
+      };
       Blog.find.mockReturnValue(mockQuery);
+      Blog.countDocuments.mockResolvedValue(2);
 
       await getBlogs(req, res, next);
 
-      expect(Blog.find).toHaveBeenCalled();
+      expect(Blog.find).toHaveBeenCalledWith({});
+      expect(Blog.countDocuments).toHaveBeenCalledWith({});
       expect(mockQuery.populate).toHaveBeenCalledWith('author', 'name');
       expect(mockQuery.sort).toHaveBeenCalledWith('-effectiveDate');
+      expect(mockQuery.skip).toHaveBeenCalledWith(0);
+      expect(mockQuery.limit).toHaveBeenCalledWith(25);
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ success: true, count: 2, data: mockBlogs });
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 2,
+        pagination: {
+          page: 1,
+          limit: 25,
+          total: 2,
+          totalPages: 1
+        },
+        data: mockBlogs
+      });
+    });
+
+    it('should apply search and pagination for blogs', async () => {
+      req.query = { search: 'React', page: '2', limit: '1' };
+
+      const mockBlogs = [{ _id: 'b2', title: 'React patterns', content: 'Hooks' }];
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockResolvedValue(mockBlogs)
+      };
+
+      const expectedFilter = {
+        $or: [
+          { title: { $regex: 'React', $options: 'i' } },
+          { content: { $regex: 'React', $options: 'i' } }
+        ]
+      };
+
+      Blog.find.mockReturnValue(mockQuery);
+      Blog.countDocuments.mockResolvedValue(3);
+
+      await getBlogs(req, res, next);
+
+      expect(Blog.find).toHaveBeenCalledWith(expectedFilter);
+      expect(Blog.countDocuments).toHaveBeenCalledWith(expectedFilter);
+      expect(mockQuery.skip).toHaveBeenCalledWith(1);
+      expect(mockQuery.limit).toHaveBeenCalledWith(1);
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith({
+        success: true,
+        count: 1,
+        pagination: {
+          page: 2,
+          limit: 1,
+          total: 3,
+          totalPages: 3,
+          next: { page: 3, limit: 1 },
+          prev: { page: 1, limit: 1 }
+        },
+        data: mockBlogs
+      });
     });
 
     it('should return 500 on error', async () => {
-      const mockQuery = { populate: jest.fn().mockReturnThis(), sort: jest.fn().mockRejectedValue(new Error('DB error')) };
+      const mockQuery = {
+        populate: jest.fn().mockReturnThis(),
+        sort: jest.fn().mockReturnThis(),
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockRejectedValue(new Error('DB error'))
+      };
       Blog.find.mockReturnValue(mockQuery);
+      Blog.countDocuments.mockResolvedValue(0);
 
       await getBlogs(req, res, next);
 
