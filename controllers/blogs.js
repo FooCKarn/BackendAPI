@@ -113,7 +113,7 @@ exports.updateBlog = async (req, res, next) => {
       allowedUpdates.title = req.body.title;
     }
     if (req.body.content !== undefined) {
-      if (req.body.content.toString().length > 250)
+      if (req.body.content.toString().length > 50)
         return res.status(400).json({ success: false, message: 'Character limit exceeded at content' });
       allowedUpdates.content = req.body.content;
     }

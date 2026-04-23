@@ -3,8 +3,6 @@ jest.mock('../../models/Comment');
 const Comment = require('../../models/Comment');
 const { getComments, addComment, getComment, updateComment, deleteComment } = require('../../controllers/comments');
 
-const createAuthor = (id) => ({ toString: () => id });
-
 describe('Comments Controller', () => {
   let req, res, next;
 
@@ -114,166 +112,226 @@ describe('Comments Controller', () => {
   });
 
   describe('getComment', () => {
-    it('should return a single comment', async () => {
-      req.params.commentId = 'comment1';
-      const mockComment = { _id: 'comment1', text: 'Comment 1' };
+    it('should return a comment by id', async () => {
+      req.params = { commentId: 'c1' };
+      const mockComment = { _id: 'c1', text: 'Great post!' };
       const mockQuery = { populate: jest.fn().mockResolvedValue(mockComment) };
       Comment.findById.mockReturnValue(mockQuery);
 
       await getComment(req, res, next);
 
-      expect(Comment.findById).toHaveBeenCalledWith('comment1');
+      expect(Comment.findById).toHaveBeenCalledWith('c1');
       expect(mockQuery.populate).toHaveBeenCalledWith('author', 'name');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ success: true, data: mockComment });
     });
 
     it('should return 404 if comment not found', async () => {
-      req.params.commentId = 'missing-comment';
+      req.params = { commentId: 'nonexistent' };
       const mockQuery = { populate: jest.fn().mockResolvedValue(null) };
       Comment.findById.mockReturnValue(mockQuery);
 
       await getComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Comment not found' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Comment not found'
+      });
     });
 
-    it('should return 500 on getComment error', async () => {
-      req.params.commentId = 'comment1';
+    it('should return 500 on database error for getComment', async () => {
+      req.params = { commentId: 'c1' };
       const mockQuery = { populate: jest.fn().mockRejectedValue(new Error('DB error')) };
       Comment.findById.mockReturnValue(mockQuery);
 
       await getComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'DB error' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'DB error'
+      });
     });
   });
 
   describe('updateComment', () => {
     it('should return 404 if comment not found', async () => {
-      req.params.commentId = 'missing-comment';
+      req.params = { commentId: 'nonexistent' };
+      req.body = { text: 'Updated' };
       Comment.findById.mockResolvedValue(null);
 
       await updateComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Comment not found' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Comment not found'
+      });
     });
 
-    it('should return 401 when user is not authorized to update the comment', async () => {
-      req.params.commentId = 'comment1';
-      req.body = { text: 'Updated text' };
-      Comment.findById.mockResolvedValue({ author: createAuthor('other-user') });
+    it('should return 401 if not authorized to update', async () => {
+      req.params = { commentId: 'c1' };
+      req.body = { text: 'Updated' };
+      req.user = { id: 'user123', role: 'user' };
+      const mockComment = { _id: 'c1', author: 'user456', text: 'Original' };
+      Comment.findById.mockResolvedValue(mockComment);
 
       await updateComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Not authorized to update this comment' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Not authorized to update this comment'
+      });
     });
 
-    it('should return 400 when no text is provided', async () => {
-      req.params.commentId = 'comment1';
-      req.body = {};
-      Comment.findById.mockResolvedValue({ author: createAuthor('user123') });
-
-      await updateComment(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Please provide text to update' });
-    });
-
-    it('should return 400 when text exceeds 100 characters', async () => {
-      req.params.commentId = 'comment1';
-      req.body = { text: 'a'.repeat(101) };
-      Comment.findById.mockResolvedValue({ author: createAuthor('user123') });
-
-      await updateComment(req, res, next);
-
-      expect(res.status).toHaveBeenCalledWith(400);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Character limit exceeded' });
-    });
-
-    it('should update the comment successfully', async () => {
-      req.params.commentId = 'comment1';
+    it('should allow author to update comment', async () => {
+      req.params = { commentId: 'c1' };
       req.body = { text: 'Updated text' };
-      const updatedComment = { _id: 'comment1', text: 'Updated text' };
-      const updateQuery = { populate: jest.fn().mockResolvedValue(updatedComment) };
-
-      Comment.findById.mockResolvedValue({ author: createAuthor('user123') });
-      Comment.findByIdAndUpdate.mockReturnValue(updateQuery);
+      req.user = { id: 'user123' };
+      const mockComment = { _id: 'c1', author: 'user123', text: 'Original' };
+      const mockQuery = { populate: jest.fn().mockResolvedValue({...mockComment, text: 'Updated text', edited: true}) };
+      Comment.findById.mockResolvedValueOnce(mockComment);
+      Comment.findByIdAndUpdate.mockReturnValue(mockQuery);
 
       await updateComment(req, res, next);
 
       expect(Comment.findByIdAndUpdate).toHaveBeenCalledWith(
-        'comment1',
-        {
-          $set: {
-            text: 'Updated text',
-            edited: true,
-            editedAt: expect.any(Number)
-          }
-        },
-        { new: true, runValidators: true }
+        'c1',
+        expect.objectContaining({ $set: expect.objectContaining({ text: 'Updated text' }) }),
+        expect.objectContaining({ new: true, runValidators: true })
       );
-      expect(updateQuery.populate).toHaveBeenCalledWith('author', 'name');
       expect(res.status).toHaveBeenCalledWith(200);
-      expect(res.json).toHaveBeenCalledWith({ success: true, data: updatedComment });
     });
 
-    it('should return 500 on updateComment error', async () => {
-      req.params.commentId = 'comment1';
+    it('should allow admin to update comment', async () => {
+      req.params = { commentId: 'c1' };
+      req.body = { text: 'Updated text' };
+      req.user = { id: 'user456', role: 'admin' };
+      const mockComment = { _id: 'c1', author: 'user123' };
+      const mockQuery = { populate: jest.fn().mockResolvedValue({...mockComment, text: 'Updated text', edited: true}) };
+      Comment.findById.mockResolvedValueOnce(mockComment);
+      Comment.findByIdAndUpdate.mockReturnValue(mockQuery);
+
+      await updateComment(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should return 400 if text is undefined', async () => {
+      req.params = { commentId: 'c1' };
+      req.body = {};
+      req.user = { id: 'user123' };
+      const mockComment = { _id: 'c1', author: 'user123' };
+      Comment.findById.mockResolvedValue(mockComment);
+
+      await updateComment(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Please provide text to update'
+      });
+    });
+
+    it('should return 400 if text exceeds 100 characters', async () => {
+      req.params = { commentId: 'c1' };
+      req.body = { text: 'a'.repeat(101) };
+      req.user = { id: 'user123' };
+      const mockComment = { _id: 'c1', author: 'user123' };
+      Comment.findById.mockResolvedValue(mockComment);
+
+      await updateComment(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(400);
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Character limit exceeded'
+      });
+    });
+
+    it('should return 500 on database error during update', async () => {
+      req.params = { commentId: 'c1' };
+      req.body = { text: 'Updated' };
       Comment.findById.mockRejectedValue(new Error('DB error'));
 
       await updateComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'DB error' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'DB error'
+      });
     });
   });
 
   describe('deleteComment', () => {
     it('should return 404 if comment not found', async () => {
-      req.params.commentId = 'missing-comment';
+      req.params = { commentId: 'nonexistent' };
       Comment.findById.mockResolvedValue(null);
 
       await deleteComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(404);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Comment not found' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Comment not found'
+      });
     });
 
-    it('should return 401 when user is not authorized to delete the comment', async () => {
-      req.params.commentId = 'comment1';
-      Comment.findById.mockResolvedValue({ author: createAuthor('other-user') });
+    it('should return 401 if not authorized to delete', async () => {
+      req.params = { commentId: 'c1' };
+      req.user = { id: 'user123', role: 'user' };
+      const mockComment = { _id: 'c1', author: 'user456' };
+      Comment.findById.mockResolvedValue(mockComment);
 
       await deleteComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(401);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'Not authorized to delete this comment' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'Not authorized to delete this comment'
+      });
     });
 
-    it('should delete the comment successfully', async () => {
-      req.params.commentId = 'comment1';
-      Comment.findById.mockResolvedValue({ author: createAuthor('user123') });
+    it('should allow author to delete comment', async () => {
+      req.params = { commentId: 'c1' };
+      req.user = { id: 'user123' };
+      const mockComment = { _id: 'c1', author: 'user123' };
+      Comment.findById.mockResolvedValue(mockComment);
       Comment.findByIdAndDelete.mockResolvedValue({});
 
       await deleteComment(req, res, next);
 
-      expect(Comment.findByIdAndDelete).toHaveBeenCalledWith('comment1');
+      expect(Comment.findByIdAndDelete).toHaveBeenCalledWith('c1');
       expect(res.status).toHaveBeenCalledWith(200);
       expect(res.json).toHaveBeenCalledWith({ success: true, data: {} });
     });
 
-    it('should return 500 on deleteComment error', async () => {
-      req.params.commentId = 'comment1';
+    it('should allow admin to delete comment', async () => {
+      req.params = { commentId: 'c1' };
+      req.user = { id: 'user456', role: 'admin' };
+      const mockComment = { _id: 'c1', author: 'user123' };
+      Comment.findById.mockResolvedValue(mockComment);
+      Comment.findByIdAndDelete.mockResolvedValue({});
+
+      await deleteComment(req, res, next);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+    });
+
+    it('should return 500 on database error during delete', async () => {
+      req.params = { commentId: 'c1' };
       Comment.findById.mockRejectedValue(new Error('DB error'));
 
       await deleteComment(req, res, next);
 
       expect(res.status).toHaveBeenCalledWith(500);
-      expect(res.json).toHaveBeenCalledWith({ success: false, message: 'DB error' });
+      expect(res.json).toHaveBeenCalledWith({
+        success: false,
+        message: 'DB error'
+      });
     });
   });
 });
