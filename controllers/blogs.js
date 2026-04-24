@@ -113,8 +113,12 @@ exports.updateBlog = async (req, res, next) => {
 
     const trimmedTitle = (newTitle ?? '').toString().trim();
     const trimmedContent = (newContent ?? '').toString().trim();
-    if(!trimmedTitle || !trimmedContent) {
-      return res.status(400).json({ success: false, message: 'Title and content cannot be empty' });
+    if(!trimmedTitle) {
+      return res.status(400).json({ success: false, message: 'Title cannot be empty' });
+    }
+
+    if(!trimmedContent) {
+      return res.status(400).json({ success: false, message: 'Content cannot be empty' });
     }
 
     if (trimmedTitle.length > 50) {
