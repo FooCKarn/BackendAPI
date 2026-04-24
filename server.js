@@ -7,7 +7,6 @@ const rateLimit = require('express-rate-limit');
 const { xss } = require('express-xss-sanitizer');
 const hpp = require('hpp');
 const cors = require('cors');
-const swaggerJsDoc = require('swagger-jsdoc');
 const swaggerUI = require('swagger-ui-express');
 
 const companies = require('./routes/companies');
@@ -15,8 +14,9 @@ const auth = require('./routes/auth');
 const bookings = require('./routes/bookings');
 const reviews = require('./routes/reviews');
 const blogs = require('./routes/blogs');
-const comments = require('./routes/comments')
+const comments = require('./routes/comments');
 const connectDB = require('./config/db');
+const buildSwaggerDocument = require('./docs/swagger');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -29,25 +29,23 @@ const limiter = rateLimit({
   max: 1000 
 });
 
-const swaggerOptions = {
-  swaggerDefinition: {
-    openapi: "3.0.0",
-    info: {
-      title: "Library API",
-      version: "1.0.0",
-      description: "A Job Fair Registration",
-    },
-    servers: [
-      {
-        url: process.env.HOST_URL || "http://localhost:5000/api/v1", 
-      },
-    ],
+const swaggerDocument = buildSwaggerDocument();
+const swaggerUiOptions = {
+  explorer: true,
+  swaggerOptions: {
+    url: '/api-docs/swagger.json',
   },
-  apis: ["./routes/*.js"],
 };
+const swaggerUiHandler = swaggerUI.setup(null, swaggerUiOptions);
 
-const swaggerDocs = swaggerJsDoc(swaggerOptions);
-app.use('/api-docs', swaggerUI.serve, swaggerUI.setup(swaggerDocs));
+app.get(/^\/api-docs$/, (req, res) => {
+  res.redirect('/api-docs/');
+});
+app.get('/api-docs/swagger.json', (req, res) => {
+  res.json(swaggerDocument);
+});
+app.use('/api-docs', swaggerUI.serveFiles(null, swaggerUiOptions));
+app.get('/api-docs/', swaggerUiHandler);
 
 app.use(express.json());
 app.use(helmet());
