@@ -103,6 +103,24 @@ exports.addReview = async (req, res, next) => {
       return res.status(404).json({ success: false, message: `No company with the id of ${req.params.id}` });
     }
 
+    // Validate rating
+    const rating = Number(req.body.rating);
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be an integer between 1 and 5' });
+    }
+
+    // Trim and validate comment
+    const trimmedComment = (req.body.comment ?? '').toString().trim();
+    if (!trimmedComment) {
+      return res.status(400).json({ success: false, message: 'Comment is required' });
+    }
+    if (trimmedComment.length > 100) {
+      return res.status(400).json({ success: false, message: 'Comment cannot exceed 100 characters' });
+    }
+
+    req.body.rating  = rating;
+    req.body.comment = trimmedComment;
+
     const review = await Review.create(req.body);
     res.status(201).json({ success: true, data: review });
   } catch (err) {
@@ -133,21 +151,32 @@ exports.updateReview = async (req, res, next) => {
       return res.status(401).json({ success: false, message: 'Not authorized to update this review' });
     }
 
-    // Whitelist updatable fields -- prevents user from overwriting company/user refs
-    const allowedUpdates = {};
-    if (req.body.rating  !== undefined) allowedUpdates.rating  = req.body.rating;
-    if (req.body.comment !== undefined) allowedUpdates.comment = req.body.comment;
     
+    const newRating = Number(req.body.rating ?? review.rating);
+    const newComment = req.body.comment ?? review.comment;
 
-    const newRating = allowedUpdates.rating !== undefined ? allowedUpdates.rating : review.rating;
-    const newComment = allowedUpdates.comment !== undefined ? allowedUpdates.comment : review.comment;
+    // Rating validation
+    if (!Number.isInteger(newRating) || newRating < 1 || newRating > 5) {
+      return res.status(400).json({ success: false, message: 'Rating must be between 1 and 5' });
+    }
 
-    if(review.rating.toString() === newRating.toString() && review.comment === newComment){
+    const trimmed = (newComment ?? '').toString().trim();
+    if(!trimmed) {
+      return res.status(400).json({ success: false, message: 'Comment is required' });
+    }
+
+    // Comment validation 
+    if (trimmed.length > 100) {
+      return res.status(400).json({ success: false, message: 'Comment cannot exceed 100 characters' });
+    }
+
+    // No-op check — return early if nothing changed
+    if (review.rating === newRating && review.comment === trimmed) {
       return res.status(200).json({ success: true, data: review });
     }
 
-    review.rating = parseInt(newRating);
-    review.comment = newComment;
+    review.rating = newRating;
+    review.comment = trimmed;
     review.edited = true;
     review.editedAt = Date.now();
 
