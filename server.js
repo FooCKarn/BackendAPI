@@ -7,7 +7,6 @@ const rateLimit = require('express-rate-limit');
 const { xss } = require('express-xss-sanitizer');
 const hpp = require('hpp');
 const cors = require('cors');
-const swaggerUI = require('swagger-ui-express');
 
 const companies = require('./routes/companies');
 const auth = require('./routes/auth');
@@ -16,7 +15,6 @@ const reviews = require('./routes/reviews');
 const blogs = require('./routes/blogs');
 const comments = require('./routes/comments');
 const connectDB = require('./config/db');
-const buildSwaggerDocument = require('./docs/swagger');
 
 dotenv.config({ path: './config/config.env' });
 
@@ -28,24 +26,6 @@ const limiter = rateLimit({
   windowMs: 10 * 60 * 1000, 
   max: 1000 
 });
-
-const swaggerDocument = buildSwaggerDocument();
-const swaggerUiOptions = {
-  explorer: true,
-  swaggerOptions: {
-    url: '/api-docs/swagger.json',
-  },
-};
-const swaggerUiHandler = swaggerUI.setup(null, swaggerUiOptions);
-
-app.get(/^\/api-docs$/, (req, res) => {
-  res.redirect('/api-docs/');
-});
-app.get('/api-docs/swagger.json', (req, res) => {
-  res.json(swaggerDocument);
-});
-app.use('/api-docs', swaggerUI.serveFiles(null, swaggerUiOptions));
-app.get('/api-docs/', swaggerUiHandler);
 
 app.use(express.json());
 app.use(helmet());
